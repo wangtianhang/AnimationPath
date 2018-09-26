@@ -93,7 +93,7 @@ public static class AnimationPathSceneUI
         }
 
         InitPointsInfo();
-        AnimationWindowUtil.SetOnClipSelectionChanged(onClipSelectionChanged);
+        AnimationPathEditor.m_clipChange += onClipSelectionChanged;
         AnimationUtility.onCurveWasModified += OnCurveWasModified;
         if (keepShow)
         {
@@ -108,7 +108,7 @@ public static class AnimationPathSceneUI
     {
         selectedPointIndex = -1;
         enabled = false;
-        AnimationWindowUtil.SetOnClipSelectionChanged(onClipSelectionChanged, true);
+        AnimationPathEditor.m_clipChange += onClipSelectionChanged;
         AnimationUtility.onCurveWasModified -= OnCurveWasModified;
         SceneView.onSceneGUIDelegate = (SceneView.OnSceneFunc)Delegate.RemoveAll(SceneView.onSceneGUIDelegate, new SceneView.OnSceneFunc(OnSceneViewGUI));
         SceneView.RepaintAll();
@@ -251,7 +251,24 @@ public static class AnimationPathSceneUI
                     Selection.activeGameObject = activeGameObject;
                 }
                 AnimationWindowUtil.SetCurrentTime(pathPoint.time);
+
+                //EditorGUI.BeginChangeCheck();
+
+                //EditorGUI.EndChangeCheck();
             }
+
+             if(selectedPointIndex == pointIndex)
+             {
+                 //EditorGUI.BeginChangeCheck();
+                 Vector3 tempPos = Handles.PositionHandle(position, handleRotation);
+                 if(tempPos != position)
+                 {
+                    //Debug.Log("point pos " + tempPos);
+                    SetPointPostion(i, tempPos);
+                 }
+                 
+                 //EditorGUI.EndChangeCheck();
+             }
 
             Handles.color = Color.grey;
             int inIndex = pointIndex - 1;
@@ -337,6 +354,41 @@ public static class AnimationPathSceneUI
             }
             CloseSceneTool();
         }
+    }
+
+    static bool SetPointPostion(int pointIndex, Vector3 postion)
+    {
+        string inPath = AnimationUtility.CalculateTransformPath(activeGameObject.transform, activeRootGameObject.transform);
+        Type inType = typeof(Transform);
+        EditorCurveBinding bindingX = EditorCurveBinding.FloatCurve(inPath, inType, "m_LocalPosition.x");
+        EditorCurveBinding bindingY = EditorCurveBinding.FloatCurve(inPath, inType, "m_LocalPosition.y");
+        EditorCurveBinding bindingZ = EditorCurveBinding.FloatCurve(inPath, inType, "m_LocalPosition.z");
+
+        AnimationCurve curveX = AnimationUtility.GetEditorCurve(activeAnimationClip, bindingX);
+        AnimationCurve curveY = AnimationUtility.GetEditorCurve(activeAnimationClip, bindingY);
+        AnimationCurve curveZ = AnimationUtility.GetEditorCurve(activeAnimationClip, bindingZ);
+
+        Keyframe[] keysX = curveX.keys;
+        Keyframe[] keysY = curveY.keys;
+        Keyframe[] keysZ = curveZ.keys;
+
+        keysX[pointIndex].value = postion.x;
+        keysY[pointIndex].value = postion.y;
+        keysZ[pointIndex].value = postion.z;
+
+        curveX.keys = keysX;
+        curveY.keys = keysY;
+        curveZ.keys = keysZ;
+        //curveX.keys[pointIndex].value = postion.x;
+        //curveY.keys[pointIndex].value = postion.y;
+        //curveZ.keys[pointIndex].value = postion.z;
+
+        AnimationUtility.SetEditorCurve(activeAnimationClip, bindingX, curveX);
+        AnimationUtility.SetEditorCurve(activeAnimationClip, bindingY, curveY);
+        AnimationUtility.SetEditorCurve(activeAnimationClip, bindingZ, curveZ);
+        AnimationWindowUtil.Repaint();
+
+        return true;
     }
 
     private static bool SetPointTangent(int pointIndex, Vector3 worldTangent, bool isInTangent)

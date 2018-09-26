@@ -133,22 +133,22 @@ public static class AnimationWindowUtil
         return animationWindowReflect.activeAnimationClip;
     }
 
-    public static void SetOnClipSelectionChanged(Action onClipSelectionChangedAction, bool removeOnly = false)
-    {
-        AnimationWindowReflect animationWindowReflect = GetAnimationWindowReflect();
-        if (!animationWindowReflect.firstAnimationWindow)
-        {
-            return;
-        }
-
-        Action onClipSelectionChanged = animationWindowReflect.onClipSelectionChanged;
-        onClipSelectionChanged = (Action)Delegate.RemoveAll(onClipSelectionChanged, onClipSelectionChangedAction);
-        if (!removeOnly)
-        {
-            onClipSelectionChanged = (Action)Delegate.Combine(onClipSelectionChanged, onClipSelectionChangedAction);
-        }
-        animationWindowReflect.onClipSelectionChanged = onClipSelectionChanged;
-    }
+//     public static void SetOnClipSelectionChanged(Action onClipSelectionChangedAction, bool removeOnly = false)
+//     {
+//         AnimationWindowReflect animationWindowReflect = GetAnimationWindowReflect();
+//         if (!animationWindowReflect.firstAnimationWindow)
+//         {
+//             return;
+//         }
+// 
+//         Action onClipSelectionChanged = animationWindowReflect.onClipSelectionChanged;
+//         onClipSelectionChanged = (Action)Delegate.RemoveAll(onClipSelectionChanged, onClipSelectionChangedAction);
+//         if (!removeOnly)
+//         {
+//             onClipSelectionChanged = (Action)Delegate.Combine(onClipSelectionChanged, onClipSelectionChangedAction);
+//         }
+//         animationWindowReflect.onClipSelectionChanged = onClipSelectionChanged;
+//     }
 
     public static void SetCurrentTime(float time)
     {

@@ -77,15 +77,22 @@ public class AnimationWindowReflect
         }
     }
 
-    private Type animationWindowSelectionType
+//     private Type animationWindowSelectionType
+//     {
+//         get
+//         {
+//             if (m_TypeAnimationWindowSelection == null)
+//             {
+//                 m_TypeAnimationWindowSelection = assembly.GetType("UnityEditorInternal.AnimationWindowSelection");
+//             }
+//             return m_TypeAnimationWindowSelection;
+//         }
+//     }
+    public FieldInfo AnimationWindowState_m_Selection
     {
         get
         {
-            if (m_TypeAnimationWindowSelection == null)
-            {
-                m_TypeAnimationWindowSelection = assembly.GetType("UnityEditorInternal.AnimationWindowSelection");
-            }
-            return m_TypeAnimationWindowSelection;
+            return animationWindowStateType.GetField("m_Selection", BindingFlags.Instance | BindingFlags.NonPublic);
         }
     }
 
@@ -306,35 +313,35 @@ public class AnimationWindowReflect
 #endif
     }
 
-    private FieldInfo onClipSelectionChangedInfo
-    {
-        get
-        {
-            if (m_onClipSelectionChangedInfo == null)
-            {
-#if UNITY_5_4_OR_NEWER
-                m_onClipSelectionChangedInfo = animationWindowSelectionType.GetField("onSelectionChanged", BindingFlags.Instance | BindingFlags.Public);
-#else
-                m_onClipSelectionChangedInfo = animationWindowStateType.GetField("onClipSelectionChanged", BindingFlags.Instance | BindingFlags.Public);
-#endif
-            }
-            return m_onClipSelectionChangedInfo;
-        }
-    }
+//     private FieldInfo onClipSelectionChangedInfo
+//     {
+//         get
+//         {
+//             if (m_onClipSelectionChangedInfo == null)
+//             {
+// #if UNITY_5_4_OR_NEWER
+//                 m_onClipSelectionChangedInfo = animationWindowSelectionType.GetField("onSelectionChanged", BindingFlags.Instance | BindingFlags.Public);
+// #else
+//                 m_onClipSelectionChangedInfo = animationWindowStateType.GetField("onClipSelectionChanged", BindingFlags.Instance | BindingFlags.Public);
+// #endif
+//             }
+//             return m_onClipSelectionChangedInfo;
+//         }
+//     }
 
     /// <summary>
     /// 动画片段切换事件
     /// </summary>
-    public Action onClipSelectionChanged
-    {
-#if UNITY_5_4_OR_NEWER
-        get { return (Action)onClipSelectionChangedInfo.GetValue(animationWindowSelection); }
-        set { onClipSelectionChangedInfo.SetValue(animationWindowSelection, value); }
-#else
-        get { return (Action) onClipSelectionChangedInfo.GetValue(animationWindowState); }
-        set { onClipSelectionChangedInfo.SetValue(animationWindowState, value);}
-#endif
-    }
+//     public Action onClipSelectionChanged
+//     {
+// #if UNITY_5_4_OR_NEWER
+//         get { return (Action)onClipSelectionChangedInfo.GetValue(animationWindowSelection); }
+//         set { onClipSelectionChangedInfo.SetValue(animationWindowSelection, value); }
+// #else
+//         get { return (Action) onClipSelectionChangedInfo.GetValue(animationWindowState); }
+//         set { onClipSelectionChangedInfo.SetValue(animationWindowState, value);}
+// #endif
+//     }
 
     public void ResampleAnimation()
     {
@@ -350,11 +357,18 @@ public class AnimationWindowReflect
 
     private void UpdateClip(object itemToUpdate, AnimationClip newClip)
     {
-        if (m_UpdateClipMethodInfo == null)
-        {
-            m_UpdateClipMethodInfo = animationWindowSelectionType.GetMethod("UpdateClip", BindingFlags.Instance | BindingFlags.Public);
-        }
-        m_UpdateClipMethodInfo.Invoke(animationWindowSelection, new[] { itemToUpdate, newClip });
+        //         if (m_UpdateClipMethodInfo == null)
+        //         {
+        //             m_UpdateClipMethodInfo = animationWindowSelectionType.GetMethod("UpdateClip", BindingFlags.Instance | BindingFlags.Public);
+        //         }
+        //m_UpdateClipMethodInfo.Invoke(animationWindowSelection, new[] { itemToUpdate, newClip });
+
+        Debug.Log("UpdateClip ");
+
+        System.Object AnimationWindowSelectionItem = AnimationWindowState_m_Selection.GetValue(animationWindowState);
+        Type selectionItemType = assembly.GetType("UnityEditor.AnimationWindowSelectionItem");
+        FieldInfo clipFiled = selectionItemType.GetField("animationClip", BindingFlags.Instance | BindingFlags.Public);
+        clipFiled.SetValue(AnimationWindowSelectionItem, newClip);
     }
 
     private void StartRecording()
