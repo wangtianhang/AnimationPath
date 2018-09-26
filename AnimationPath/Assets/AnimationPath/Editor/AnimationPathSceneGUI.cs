@@ -174,6 +174,11 @@ public static class AnimationPathSceneUI
         }
     }
 
+    static void TestCap(int controlID, Vector3 position, Quaternion rotation, float size, EventType eventType)
+    {
+
+    }
+
     private static void DrawSceneViewGUI()
     {
         if (reloadPointsInfo)
@@ -245,11 +250,12 @@ public static class AnimationPathSceneUI
             if (Handles.Button(position, handleRotation, pointHandleSize, pointPickSize, Handles.DotCap))
 #endif
             {
+                //Debug.Log("test1");
                 selectedPointIndex = pointIndex;
-                if (Selection.activeGameObject != activeGameObject)
-                {
-                    Selection.activeGameObject = activeGameObject;
-                }
+                  if (Selection.activeGameObject != activeGameObject)
+                  {
+                      Selection.activeGameObject = activeGameObject;
+                  }
                 AnimationWindowUtil.SetCurrentTime(pathPoint.time);
 
                 //EditorGUI.BeginChangeCheck();
@@ -259,14 +265,15 @@ public static class AnimationPathSceneUI
 
              if(selectedPointIndex == pointIndex)
              {
-                 //EditorGUI.BeginChangeCheck();
-                 Vector3 tempPos = Handles.PositionHandle(position, handleRotation);
-                 if(tempPos != position)
-                 {
-                    //Debug.Log("point pos " + tempPos);
-                    SetPointPostion(i, tempPos);
-                 }
-                 
+                  EditorGUI.BeginChangeCheck();
+                  //Debug.Log("PositionHandle1 " + Time.frameCount);
+                  Vector3 tempPos = Handles.PositionHandle(position, handleRotation);
+                  if(EditorGUI.EndChangeCheck() && tempPos != position)
+                  {
+                     //Debug.Log("point pos " + tempPos);
+                     SetPointPostion(i, tempPos);
+                     return;
+                  }
                  //EditorGUI.EndChangeCheck();
              }
 
@@ -293,6 +300,7 @@ public static class AnimationPathSceneUI
                 if (selectedPointIndex == inIndex)
                 {
                     EditorGUI.BeginChangeCheck();
+                    //Debug.Log("PositionHandle2 " + Time.frameCount);
                     Vector3 pos = Handles.PositionHandle(pathPoint.worldInTangent, handleRotation);
                     if (EditorGUI.EndChangeCheck() && SetPointTangent(i, pos, true))
                     {
@@ -316,6 +324,7 @@ public static class AnimationPathSceneUI
                 if (selectedPointIndex == outIndex)
                 {
                     EditorGUI.BeginChangeCheck();
+                    //Debug.Log("PositionHandle3 " + Time.frameCount);
                     Vector3 pos = Handles.PositionHandle(pathPoint.worldOutTangent, handleRotation);
                     if (EditorGUI.EndChangeCheck() && SetPointTangent(i, pos, false))
                     {
