@@ -381,6 +381,12 @@ public static class AnimationPathSceneUI
         Keyframe[] keysY = curveY.keys;
         Keyframe[] keysZ = curveZ.keys;
 
+        if(keysX.Length != keysY.Length || keysY.Length != keysZ.Length)
+        {
+            Debug.LogError("xyz三个轴节点数量不一致");
+            return false;
+        }
+
         keysX[pointIndex].value = postion.x;
         keysY[pointIndex].value = postion.y;
         keysZ[pointIndex].value = postion.z;
